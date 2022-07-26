@@ -4,6 +4,7 @@ import { fetchQuizQuestions } from './API';
 import QuestionCard from './components/QuestionCard';
 // Types 
 import { QuestionState, Difficulty } from './API';
+import Timer from './components/timerclock';
 
 export type AnswerObject = {
   question: string;
@@ -99,6 +100,7 @@ const App = () => {
       </button>
       
   ) : null}
+    <Timer />
     </div>
   );
 }
