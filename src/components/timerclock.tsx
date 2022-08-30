@@ -1,6 +1,8 @@
 import React from 'react';
 import { useState, useEffect } from "react";
 
+//timer function
+
 interface State {
     time:  number;
     seconds: number;
