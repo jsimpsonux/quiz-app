@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { fetchQuizQuestions } from './API';
+import React, { useEffect, useState } from 'react';
 // Components
 import QuestionCard from './components/QuestionCard';
 // Types
-import { QuestionState, Difficulty } from './API';
-import Timer from './components/timerclock';
+import { QuestionState } from './API';
+import Timer, { useTimer } from './components/Timer';
 
 import StartButton from './components/StartButton';
+
 export type AnswerObject = {
    question: string;
    answer: string;
@@ -15,6 +15,7 @@ export type AnswerObject = {
 };
 
 const TOTAL_QUESTIONS = 10;
+const TIME_ALLOWED = 5;
 
 const App = () => {
    const [loading, setLoading] = useState(false);
@@ -24,9 +25,7 @@ const App = () => {
    const [score, setScore] = useState(0);
    const [gameOver, setGameOver] = useState(true);
 
-   console.log({ gameOver });
-   console.log({ loading });
-   console.log({ questions });
+   const { timeRemaining, toggle, reset, isActive } = useTimer(TIME_ALLOWED);
 
    const checkAnswer = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!gameOver) {
@@ -44,6 +43,7 @@ const App = () => {
             correctAnswer: questions[number].correct_answer,
          };
          setUserAnswers((prev) => [...prev, answerObject]);
+         console.log({ answerObject });
       }
    };
 
@@ -58,6 +58,13 @@ const App = () => {
       }
    };
 
+   useEffect(() => {
+      // If the timer reaches 0, the game is over
+      if (timeRemaining <= 0) {
+         setGameOver(true);
+      }
+   }, [timeRemaining]);
+
    return (
       <div className="App">
          <h1>REACT QUIZ</h1>
@@ -69,10 +76,11 @@ const App = () => {
                setNumber={setNumber}
                setScore={setScore}
                setGameOver={setGameOver}
+               toggleTimer={toggle}
             />
          )}
 
-         {!gameOver ? <p className="score">Score:</p> : null}
+         {!gameOver ? <p className="score">Score: {score}</p> : null}
          {loading && <p>Loading Questions...</p>}
          {!loading && !gameOver && (
             <QuestionCard
@@ -92,7 +100,12 @@ const App = () => {
                Next Question
             </button>
          ) : null}
-         <Timer />
+         <Timer
+            timeRemaining={timeRemaining}
+            isActive={isActive}
+            toggle={toggle}
+            reset={reset}
+         />
       </div>
    );
 };
